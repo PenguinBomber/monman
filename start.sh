@@ -53,7 +53,8 @@ main () {
 		
 		#grab monitor info from config
 		local monitor=`printf "$monitor_conf" | awk '{print $1}'`
-		local option=`printf "$monitor_conf" | awk '{print $2}'`
+		local name=`printf "$monitor_conf" | awk '{print $2}'`
+		local option=`printf "$monitor_conf" | awk '{print $3}'`
 		
 		local status=`xrandr | grep "$monitor " | awk '{print $2}'`
 		
@@ -82,7 +83,7 @@ main () {
 				xrandr --output $monitor --right-of $last_monitor --auto $xrandr_opt
 			fi
 			
-			bspc monitor $monitor -d "$monitor 1" "$monitor 2"
+			bspc monitor $monitor -d "$name 1" "$name 2"
 			feh --bg-fill ~/.config/wallpaper
 
 			last_monitor="$monitor"

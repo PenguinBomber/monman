@@ -103,4 +103,4 @@ fi
 while [ 1 = 1 ]
 do
 	main
-done &
+done

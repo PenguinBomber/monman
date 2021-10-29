@@ -43,8 +43,6 @@ first_time_setup () {
 
 #main loop of the script
 main () {
-	bspc subscribe -c 1 monitor_geometry
-		
 	# Run through monitors one by one
 	last_monitor=""
 	while read monitor_conf
@@ -68,12 +66,13 @@ main () {
 		#connect the monitors if present
 		if [ "$status" = "connected" ]
 		then
-			
+			#check if the monitor is set as primary and set it accordingly
 			if [ "$option" = "primary" ]
 			then
 				xrandr_opt="--primary"
 			fi
-			
+
+			#turn on each monitor and put each new monitor to the right of the last monitor
 			if [ "$last_monitor" = "" ]
 			then
 				log "Connecting $monitor $option"
@@ -82,18 +81,23 @@ main () {
 				log "Connecting $monitor $option to the right of $last_monitor"
 				xrandr --output $monitor --right-of $last_monitor --auto $xrandr_opt
 			fi
+
+			#setup the desktops for each monitor with BSPWM
+			bspc monitor $monitor -d "$name 1" "$name 2" "$name 3"
 			
-			bspc monitor $monitor -d "$name 1" "$name 2"
+			#set the background again so feh fills the new monitors
 			feh --bg-fill ~/.config/wallpaper
 
 			last_monitor="$monitor"
 		fi
 			
 	done < "$config_dir/monitors"
-
+	
 	#pick up all the windows that got left on disconnected monitors
 	bspc wm --adopt-orphans
-		
+
+	#wait for a change in monitor geometry, signifys a monitor has been connected
+	bspc subscribe -c 1 monitor_geometry
 }
 
 if [ ! -e $config_dir/monitors ]
